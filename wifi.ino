@@ -1,6 +1,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #include <DHT.h>
+#include "wifiConfig.c"
 
 #define PIN_MOISTURE 0 // moisture sensor analog on PIN 0
 #define PIN_DHT 4 // temp + humidity sensor
@@ -13,7 +14,7 @@ DHT dht(PIN_DHT, DHT_TYPE);
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting setup");
-  WiFi.begin("gastnetz", "lol");
+  WiFi.begin(WIFI_SSID, WIFI_KEY);
     Serial.print("Waiting for WiFi connection..");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
