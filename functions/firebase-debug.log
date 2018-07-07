@@ -1,0 +1,43 @@
+[debug] [2018-07-07T22:54:04.594Z] ----------------------------------------------------------------------
+[debug] [2018-07-07T22:54:04.598Z] Command:       /Users/anoff/.nvm/versions/node/v6.14.3/bin/node /usr/local/bin/firebase serve --only functions
+[debug] [2018-07-07T22:54:04.599Z] CLI Version:   3.18.6
+[debug] [2018-07-07T22:54:04.599Z] Platform:      darwin
+[debug] [2018-07-07T22:54:04.599Z] Node Version:  v6.14.3
+[debug] [2018-07-07T22:54:04.600Z] Time:          Sun Jul 08 2018 00:54:04 GMT+0200 (CEST)
+[debug] [2018-07-07T22:54:04.600Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-07-07T22:54:04.621Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-07-07T22:54:04.621Z] > authorizing via signed-in user
+[debug] [2018-07-07T22:54:04.625Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-07-07T22:54:04.626Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/A7qFVWkWu_U5vAtNuqEgD0Pa7kC5IvBcPGAerN4CIFM',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Sun Jul 08 2018 00:54:04 GMT+0200 (CEST)
+[debug] [2018-07-07T22:54:04.891Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-07T22:54:04.912Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/plantbuddy-9b971  
+  
+ Sun Jul 08 2018 00:54:04 GMT+0200 (CEST)
+[debug] [2018-07-07T22:54:05.770Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-07T22:54:05.772Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/plantbuddy-9b971/tokens  
+  
+ Sun Jul 08 2018 00:54:05 GMT+0200 (CEST)
+[debug] [2018-07-07T22:54:06.526Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-07T22:54:06.528Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/plantbuddy-9b971  
+  
+ Sun Jul 08 2018 00:54:06 GMT+0200 (CEST)
+[debug] [2018-07-07T22:54:07.491Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/developer/anoff/nodemcu-planter'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-07-07T22:54:09.620Z] Fetching environment
+[debug] [2018-07-07T22:54:09.622Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/258301388644:getServerAppConfig  
+  
+ Sun Jul 08 2018 00:54:09 GMT+0200 (CEST)
+[debug] [2018-07-07T22:54:10.159Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-07T22:54:10.161Z] Starting @google-cloud/functions-emulator
+[debug] [2018-07-07T22:54:12.228Z] Parsing function triggers
+[info] ✔  functions: newData: http://localhost:5000/plantbuddy-9b971/us-central1/newData

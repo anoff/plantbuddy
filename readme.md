@@ -38,7 +38,11 @@ As an output you will get a `git_url` this is where you need to deploy the backe
 
 ### Backend code
 
-After deploying the backend services the [code](fn-backend/) needs to be deployed into the Azure Function. 
+```text
+firebase functions:config:set owm.key=<OpenWeatherMap API Token>
+firebase functions:config:set header.secret=<some secret>
+```
+
 
 ## Useful links
 

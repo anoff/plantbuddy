@@ -26,6 +26,4 @@ local.settings.json
 
 node_modules
 wifiConfig.c
-terraform.tfvars
-.terraform/
-*.tfstate*
+.runtimeconfig.json
