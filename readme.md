@@ -6,11 +6,21 @@
 
 The hardware setup consists of a [ESP8266](https://en.wikipedia.org/wiki/ESP8266) Microcontroller with a powersupply and two connected sensors.
 
-- [DHT222](https://www.adafruit.com/product/385) connected to **D2** digital input pin
+- [DHT22](https://www.adafruit.com/product/385) connected to **D2** digital input pin
 - [Soil moisture sensor](https://www.sparkfun.com/products/13322) connected to **A0**
-- Bridge between D0 and RST to enable deep sleep for optimizing battery life
+- Bridge between **D0** and **RST** to enable deep sleep for optimizing battery life
+
+> To program the ESP8266 you need to clear the connection to **RST**
 
 [<img src="sketch.png" height="600px" alt="Fritzing diagram"/>](sketch.png)
+
+### Power consumption
+
+- ESP8266 draws `~80mA` when active and few `µA` when in deepsleep
+- Maximum output current per GPIO pin is `12mA`
+- Photo resistor has `10kOhm` resistor -> `3V3 / 10kOhm = 33mA`
+- Moisture sensor consumes `35mA`
+- DHT222 max current `2.5mA`
 
 ## Useful links
 

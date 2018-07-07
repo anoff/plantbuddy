@@ -6,23 +6,23 @@
 #define PIN_MOISTURE 0 // moisture sensor analog on PIN 0
 #define PIN_DHT 4 // temp + humidity sensor
 #define DHT_TYPE DHT22
-#define INTERVAL_READ 2000
-#define INTERVAL_CYCLE 100
+#define SLEEP_S 300
+#define DEVICE_ID "plantbuddy1"
 
 DHT dht(PIN_DHT, DHT_TYPE);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting setup");
-  WiFi.begin(WIFI_SSID, WIFI_KEY);
-    Serial.print("Waiting for WiFi connection..");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println(".");
-  Serial.print("Successfully connected to ");
-  Serial.println(WiFi.SSID());
+  wifiConnect(WIFI_SSID, WIFI_KEY);
+  //ESP.deepSleep(SLEEP_S * 1000000);
+}
+
+void loop() {
+  Serial.println("Sending heartbeat..");
+  int httpBeat = submitHeartbeat(POST_URL, DEVICE_ID);
+  Serial.print("Heartbeat HTTP Response: ");
+  Serial.println(httpBeat);
   float moisture = getMoistureLevel(PIN_MOISTURE);
   float humidity = dht.readHumidity();
   float temp = dht.readTemperature(false);
@@ -36,13 +36,11 @@ void setup() {
     heatIndex = dht.computeHeatIndex(temp, humidity, false);
   }
   logSensorStatus(moisture, temp, humidity, heatIndex);
+  Serial.println("Sending sensor data..");
   int httpCode = submitSensorStatus(POST_URL, moisture, temp, humidity, heatIndex);
-  Serial.print("HTTP response: ");
+  Serial.print("Sensor data HTTP response: ");
   Serial.println(httpCode);
-  ESP.deepSleep(300 * 1000000);
-}
-
-void loop() {
+  delay(20000);
 }
 
 float getMoistureLevel(int PIN) {
@@ -67,16 +65,20 @@ void logSensorStatus(float moisture, float temp, float humidity, float heatIndex
   Serial.println("");
 }
 
-int submitSensorStatus(char*  url, float moisture, float temp, float humidity, float heatIndex) {
+int submitSensorStatus(char* url, float moisture, float temp, float humidity, float heatIndex) {
   HTTPClient http;
-  String json = '{';
-  json += '"moisture": ';
+  String json = "{";
+  json += "\"moisture\": ";
   json += moisture;
-  json += ', "temp": ';
+  json += ", \"temp\": ";
   json += temp;
-  json += ', "humidity": ';
+  json += ", \"humidity\": ";
   json += humidity;
-  json += '}';
+  json += ", \"id\": \"";
+  json += DEVICE_ID;
+  json += "\"";
+  json += ", \"type\": \"data\"";
+  json += "}";
   http.begin(url);
   int httpCode = http.POST(json);
   String payload = http.getString();
@@ -86,4 +88,34 @@ int submitSensorStatus(char*  url, float moisture, float temp, float humidity, f
   }
   http.end();
   return httpCode;
+}
+
+int submitHeartbeat(char*  url, char* id) {
+  HTTPClient http;
+  String json = "{\"msg\": \"Still alive \\o/\", \"id\": \"";
+  json += id;
+  json += "\"";
+  json += ", \"type\": \"heartbeat\"";
+  json += " }";
+  http.begin(url);
+  int httpCode = http.POST(json);
+  String payload = http.getString();
+  if (httpCode < 0) {
+    Serial.print("Error: ");
+    Serial.println(http.errorToString(httpCode).c_str());
+  }
+  http.end();
+  return httpCode;
+}
+
+void wifiConnect(char* ssid, char* key) {
+  WiFi.begin(ssid, key);
+  Serial.print("Waiting for WiFi connection..");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println(".");
+  Serial.print("Successfully connected to ");
+  Serial.println(WiFi.SSID());
 }
