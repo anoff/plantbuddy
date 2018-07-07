@@ -35,7 +35,7 @@ resource "azurerm_function_app" "pb" {
   app_settings {
     TABLE_STORAGE = "${azurerm_storage_account.pb.primary_connection_string}"
     OWM_KEY       = "${var.owm_key}"
-    COSMOS_DB     = "${azurerm_cosmosdb_account.pb.write_endpoints[0]}"
+    COSMOS_DB     = "AccountEndpoint=${azurerm_cosmosdb_account.pb.endpoint};AccountKey=${azurerm_cosmosdb_account.pb.primary_master_key};"
   }
 
   provisioner "local-exec" {

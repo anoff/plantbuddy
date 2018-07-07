@@ -23,6 +23,23 @@ The hardware setup consists of a [ESP8266](https://en.wikipedia.org/wiki/ESP8266
 - Moisture sensor consumes `35mA`
 - DHT222 max current `2.5mA`
 
+## Setup
+
+### Serverless backend
+
+The backend is hosted on Microsoft Azure and can be deployed using [Terraform](https://www.terraform.io/). In the [terraform/](terraform/) folder is the recipe to deploy the required components. To run this command the Azure CLI needs to be installed and a valid Azure subscription has to exist.
+
+```sh
+cd terraform
+terraform apply -var owm_key=<YOUR KEY>
+```
+
+As an output you will get a `git_url` this is where you need to deploy the backend code to.
+
+### Backend code
+
+After deploying the backend services the [code](fn-backend/) needs to be deployed into the Azure Function. 
+
 ## Useful links
 
 - https://openhomeautomation.net/esp8266-battery

@@ -18,7 +18,16 @@
       "type": "table",
       "name": "outputTable",
       "tableName": "records",
-      "connection": "anoff0planter_STORAGE",
+      "connection": "TABLE_STORAGE",
+      "direction": "out"
+    },
+    {
+      "type": "documentDB",
+      "name": "outputDocument",
+      "databaseName": "outDatabase",
+      "collectionName": "MyCollection",
+      "createIfNotExists": false,
+      "connection": "COSMOS_DB",
       "direction": "out"
     }
   ],
