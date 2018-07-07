@@ -9,6 +9,7 @@ The hardware setup consists of a [ESP8266](https://en.wikipedia.org/wiki/ESP8266
 - [DHT22](https://www.adafruit.com/product/385) connected to **D2** digital input pin
 - [Soil moisture sensor](https://www.sparkfun.com/products/13322) connected to **A0**
 - Bridge between **D0** and **RST** to enable deep sleep for optimizing battery life
+- switch off sensors during deepsleep using a transistor driven via pin **D1**
 
 > To program the ESP8266 you need to clear the connection to **RST**
 
