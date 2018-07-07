@@ -23,29 +23,26 @@ void setup() {
   Serial.println(".");
   Serial.print("Successfully connected to ");
   Serial.println(WiFi.SSID());
+  float moisture = getMoistureLevel(PIN_MOISTURE);
+  float humidity = dht.readHumidity();
+  float temp = dht.readTemperature(false);
+  float heatIndex = dht.computeHeatIndex(temp, humidity, false);
+  while (isnan(humidity) || isnan(temp) || isnan(heatIndex)) {
+    Serial.println("Error while reading sensor values, retrying");
+    delay(2000);
+    moisture = getMoistureLevel(PIN_MOISTURE);
+    humidity = dht.readHumidity();
+    temp = dht.readTemperature(false);
+    heatIndex = dht.computeHeatIndex(temp, humidity, false);
+  }
+  logSensorStatus(moisture, temp, humidity, heatIndex);
+  int httpCode = submitSensorStatus(POST_URL, moisture, temp, humidity, heatIndex);
+  Serial.print("HTTP response: ");
+  Serial.println(httpCode);
+  ESP.deepSleep(300 * 1000000);
 }
 
-int msSinceLastRead = 0;
 void loop() {
- if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
-  if (msSinceLastRead >= INTERVAL_READ) {
-    float moisture = getMoistureLevel(PIN_MOISTURE);
-    float humidity = dht.readHumidity();
-    float temp = dht.readTemperature(false);
-    float heatIndex = dht.computeHeatIndex(temp, humidity, false);
-    if (isnan(humidity) || isnan(temp) || isnan(heatIndex)) {
-      Serial.println("Error while reading sensor values, retrying");
-      msSinceLastRead = max(INTERVAL_READ - 1000, 0);
-      return;
-    }
-    logSensorStatus(moisture, temp, humidity, heatIndex);
-    msSinceLastRead = 0;
-  }
- } else {
-  Serial.println("WiFi connection broke");   
- }
-  delay(INTERVAL_CYCLE);
-  msSinceLastRead += INTERVAL_CYCLE;
 }
 
 float getMoistureLevel(int PIN) {
@@ -68,4 +65,25 @@ void logSensorStatus(float moisture, float temp, float humidity, float heatIndex
   Serial.print("Heat Index: ");
   Serial.print(heatIndex);
   Serial.println("");
+}
+
+int submitSensorStatus(char*  url, float moisture, float temp, float humidity, float heatIndex) {
+  HTTPClient http;
+  String json = '{';
+  json += '"moisture": ';
+  json += moisture;
+  json += ', "temp": ';
+  json += temp;
+  json += ', "humidity": ';
+  json += humidity;
+  json += '}';
+  http.begin(url);
+  int httpCode = http.POST(json);
+  String payload = http.getString();
+  if (httpCode < 0) {
+    Serial.print("Error: ");
+    Serial.println(http.errorToString(httpCode).c_str());
+  }
+  http.end();
+  return httpCode;
 }
