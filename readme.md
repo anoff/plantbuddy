@@ -40,10 +40,20 @@ As an output you will get a `git_url` this is where you need to deploy the backe
 
 ```text
 firebase functions:config:set owm.key=<OpenWeatherMap API Token>
+firebase functions:config:set owm.city_id=2873776 // according to [OWM City ID List](https://openweathermap.org/current#cityid)
 firebase functions:config:set header.secret=<some secret>
 ```
 
+#### Local development
 
+For devleoping the function locally:
+
+```sh
+# get a copy of the environment config
+firebase functions:config:get > functions/.runtimeconfig.json
+# start function host locally
+firebase serve --only functions
+```
 ## Useful links
 
 - https://openhomeautomation.net/esp8266-battery

@@ -1,7 +1,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #include <DHT.h>
-#include "wifiConfig.c"
+#include "esp8266.secrets.c"
 
 #define PIN_MOISTURE 0 // moisture sensor analog on PIN 0
 #define PIN_DHT 4 // temp + humidity sensor
@@ -66,7 +66,6 @@ void logSensorStatus(float moisture, float temp, float humidity, float heatIndex
 }
 
 int submitSensorStatus(char* url, float moisture, float temp, float humidity, float heatIndex) {
-  HTTPClient http;
   String json = "{";
   json += "\"moisture\": ";
   json += moisture;
@@ -79,27 +78,32 @@ int submitSensorStatus(char* url, float moisture, float temp, float humidity, fl
   json += "\"";
   json += ", \"type\": \"data\"";
   json += "}";
-  http.begin(url);
-  int httpCode = http.POST(json);
-  String payload = http.getString();
-  if (httpCode < 0) {
-    Serial.print("Error: ");
-    Serial.println(http.errorToString(httpCode).c_str());
-  }
-  http.end();
+  int httpCode = httpPost(url, json);
   return httpCode;
 }
 
 int submitHeartbeat(char*  url, char* id) {
-  HTTPClient http;
-  String json = "{\"msg\": \"Still alive \\o/\", \"id\": \"";
+  String json = "{";
+  json += "\"msg\": \"Still alive\"";
+  json += ", \"id\": \"";
   json += id;
   json += "\"";
   json += ", \"type\": \"heartbeat\"";
-  json += " }";
+  json += "}";
+  int httpCode = httpPost(url, json);
+  return httpCode;
+}
+
+// send HTTP post with JSON payload
+int httpPost(char* url, String payload) {
+  HTTPClient http;
   http.begin(url);
-  int httpCode = http.POST(json);
-  String payload = http.getString();
+  http.addHeader("Content-Type", "application/json");
+  if (HEADER_SECRET) {
+    http.addHeader("SECRET", HEADER_SECRET);
+  }
+  int httpCode = http.POST(payload);
+  String response = http.getString();
   if (httpCode < 0) {
     Serial.print("Error: ");
     Serial.println(http.errorToString(httpCode).c_str());
@@ -108,6 +112,7 @@ int submitHeartbeat(char*  url, char* id) {
   return httpCode;
 }
 
+// try to connect to given SSID and key, loop until successful
 void wifiConnect(char* ssid, char* key) {
   WiFi.begin(ssid, key);
   Serial.print("Waiting for WiFi connection..");

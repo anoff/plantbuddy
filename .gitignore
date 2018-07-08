@@ -25,5 +25,6 @@ appsettings.json
 local.settings.json
 
 node_modules
-wifiConfig.c
+esp8266.secrets.c
 .runtimeconfig.json
+firebase-debug.log

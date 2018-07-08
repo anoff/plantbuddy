@@ -1,5 +1,6 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
+const axios = require('axios')
 admin.initializeApp()
 
 exports.newData = functions.https.onRequest((req, res) => {
@@ -14,6 +15,7 @@ exports.newData = functions.https.onRequest((req, res) => {
     return res.status(401).send('Unauthorized 👮‍ ')
   }
   if (!req.body || ['heartbeat', 'data'].indexOf(req.body.type) === -1) {
+    console.log({payload: req.body})
     return res.status(400).send('Invalid payload type 📦')
   }
   const type = req.body.type
@@ -25,5 +27,21 @@ exports.newData = functions.https.onRequest((req, res) => {
     })
 })
 
-// TODO: set up function to fetch weather and append it to each request
-// - auth?
+// append weather info to sensor reading
+exports.fetchWeather = functions.firestore
+  .document('data/{entryId}')
+  .onCreate((snapshot, context) => {
+    const cityId = functions.config().owm.city_id
+    const apiKey = functions.config().owm.key
+
+    return axios.get(`https://api.openweathermap.org/data/2.5/weather?id=${cityId}&appid=${apiKey}&units=metric`)
+      .then(res => {
+        const weather = res.data
+        // convert dates to readable strings
+        weather.date = new Date(weather.dt * 1000).toISOString()
+        weather.sunrise = new Date(weather.sys.sunrise * 1000).toISOString()
+        weather.sunset = new Date(weather.sys.sunset * 1000).toISOString()
+
+        return snapshot.ref.set({weather}, {merge: true})
+      })
+  })
