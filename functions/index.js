@@ -7,18 +7,23 @@ exports.newData = functions.https.onRequest((req, res) => {
   // functions.config().owm.key
 
   if (req.method !== 'POST') {
-    return res.status(403).send('Forbidden 🙅‍ ')
+    return res.status(405).send('Unsupported method 🤷‍')
   }
   const secret = req.get('SECRET')
-  console.log(functions.config())
   if (secret !== functions.config().header.secret) {
     return res.status(401).send('Unauthorized 👮‍ ')
   }
-  admin.firestore().collection('values').add({
-    id: 'blup',
-    value: 'asdf'
-  })
+  if (!req.body || ['heartbeat', 'data'].indexOf(req.body.type) === -1) {
+    return res.status(400).send('Invalid payload type 📦')
+  }
+  const type = req.body.type
+  const doc = JSON.parse(JSON.stringify(req.body))
+  doc.date = new Date().toISOString()
+  admin.firestore().collection(type).add(doc)
     .then(doc => {
-      res.send(`Created entry ${doc.id}`)
+      res.send(`Created entry ${doc.id} under /${type}`)
     })
 })
+
+// TODO: set up function to fetch weather and append it to each request
+// - auth?
