@@ -1,0 +1,26 @@
+@startuml esp8266
+!includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
+start
+:initialize Serial connection;
+
+:connecto to WiFi;
+while (connection) is (not established)
+  :wait 0.5s;
+endwhile (successful)
+:submit heartbeat;
+
+:read moisture level;
+:read humidty + temperature;
+while (sensor readings) is (invalid)
+  :wait 2s;
+  :read humidty + temperature;
+  :increase counter;
+  if (MAX_READING_RETRIES reached) then (yes)
+    :send controller to deep sleep;
+  endif
+endwhile (valid)
+:submit sensor data;
+
+:send controller to deep sleep;
+end
+@enduml

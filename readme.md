@@ -1,6 +1,15 @@
-# plant buddy
+# plantbuddy
 
 > nodeMCU based moisture monitoring for plants 🌱 with a serverless backend
+
+## Main Features
+
+1. Collect sensor readings every 5 minutes
+1. Submit values to serverless infrastructure using local WiFi network
+1. Automatically fetch weather report for each reading using backend function
+1. later have a UI as well 🙄
+
+![system overview](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.github.com/anoff/plantbuddy/master/assets/overview.iuml)
 
 ## Hardware
 
@@ -23,20 +32,26 @@ The hardware setup consists of a [ESP8266](https://en.wikipedia.org/wiki/ESP8266
 - Moisture sensor consumes `35mA`
 - DHT222 max current `2.5mA`
 
+## Microcontroller
+
+The ESP8266 chip is programmed with the [esp8266.ino file](esp8266.ino) using the [Arduino IDE](https://www.arduino.cc/en/Main/Software?). Secrets for connecting to local WiFi and endpoints to post data need to be defined in a `esp8266.secrets.c` file which is specified at [esp8266.secrets.template.c](esp8266.secrets.template.c).
+
+![esp8266 flowchart](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.github.com/anoff/plantbuddy/master/assets/esp8266.iuml)
+
 ## Setup
 
 ### Serverless backend
 
-The backend is hosted on Microsoft Azure and can be deployed using [Terraform](https://www.terraform.io/). In the [terraform/](terraform/) folder is the recipe to deploy the required components. To run this command the Azure CLI needs to be installed and a valid Azure subscription has to exist.
+As a backend solution the plantbuddy runs on [Google's firebase 🔥](https://console.firebase.google.com) platform. The main functionalities used from firebase are:
 
-```sh
-cd terraform
-terraform apply -var owm_key=<YOUR KEY>
-```
+1. Firestore database to store all sensor readings and heartbeats
+1. Firebase functions for providing an **HTTP endpoint** as well as querying for **weather data** for each sensor reading
 
-As an output you will get a `git_url` this is where you need to deploy the backend code to.
+> Note: As outbound traffic is required to collect weather data, the project should run in **BLAZE** plan. Function and database usage should be within the free tier, only outbound traffic will be billed.
 
 ### Backend code
+
+Before deploying the backend code several variables need to be set so the service can work correctly. An API token for [OpenWeatherMap](https://openweathermap.org/price) can be obtained from their website. A free account should suffice unless a _LOT_ of plantbuddies are running on one account.
 
 ```text
 firebase functions:config:set owm.key=<OpenWeatherMap API Token>

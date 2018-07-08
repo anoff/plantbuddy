@@ -1,0 +1,21 @@
+@startuml esp8266
+!includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.0.0
+!includeurl ICONURL/common.puml
+!includeurl ICONURL/devicons/firebase.puml
+!includeurl ICONURL/font-awesome-5/microchip.puml
+!includeurl ICONURL/font-awesome-5/chart_bar.puml
+skinparam defaultTextAlignment center
+
+DEV_FIREBASE(db, database, database)
+DEV_FIREBASE(http_func, HTTP endpoint, node)
+DEV_FIREBASE(weather_func, Weather Query, node)
+FA5_MICROCHIP(uc, ESP8266, node)
+FA5_CHART_BAR(sensors, sensors, card)
+
+sensors - uc
+uc -down-> http_func: report heartbeat/data
+http_func -> db: store data
+db ..> weather_func: trigger weather query
+weather_func -> db: enrich sensor reading\nwith weather data
+@enduml
