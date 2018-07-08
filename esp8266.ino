@@ -6,8 +6,9 @@
 #define PIN_MOISTURE 0 // moisture sensor analog on PIN 0
 #define PIN_DHT 4 // temp + humidity sensor
 #define DHT_TYPE DHT22
-#define SLEEP_S 300
+#define SLEEP_S 300 // how many seconds to sleep between readings
 #define DEVICE_ID "plantbuddy1"
+#define MAX_READING_RETRIES 10 // maximum number of retries when getting NaN values from sensor
 
 DHT dht(PIN_DHT, DHT_TYPE);
 
@@ -15,18 +16,17 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Starting setup");
   wifiConnect(WIFI_SSID, WIFI_KEY);
-  //ESP.deepSleep(SLEEP_S * 1000000);
-}
-
-void loop() {
+  // submit heartbeat
   Serial.println("Sending heartbeat..");
   int httpBeat = submitHeartbeat(POST_URL, DEVICE_ID);
   Serial.print("Heartbeat HTTP Response: ");
   Serial.println(httpBeat);
+  // read sensor values
   float moisture = getMoistureLevel(PIN_MOISTURE);
   float humidity = dht.readHumidity();
   float temp = dht.readTemperature(false);
   float heatIndex = dht.computeHeatIndex(temp, humidity, false);
+  int count = 0;
   while (isnan(humidity) || isnan(temp) || isnan(heatIndex)) {
     Serial.println("Error while reading sensor values, retrying");
     delay(2000);
@@ -34,13 +34,21 @@ void loop() {
     humidity = dht.readHumidity();
     temp = dht.readTemperature(false);
     heatIndex = dht.computeHeatIndex(temp, humidity, false);
+    count++;
+    // force ESP into deepsleep so heartbeat gets out in case of permanent sensor damage
+    if (count > MAX_READING_RETRIES) {
+      ESP.deepSleep(SLEEP_S * 1000000);
+    }
   }
   logSensorStatus(moisture, temp, humidity, heatIndex);
   Serial.println("Sending sensor data..");
   int httpCode = submitSensorStatus(POST_URL, moisture, temp, humidity, heatIndex);
   Serial.print("Sensor data HTTP response: ");
   Serial.println(httpCode);
-  delay(20000);
+  ESP.deepSleep(SLEEP_S * 1000000);
+}
+
+void loop() {
 }
 
 float getMoistureLevel(int PIN) {
