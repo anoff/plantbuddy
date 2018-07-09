@@ -3,9 +3,14 @@ node_js:
   - "10"
 
 script:
+  - echo "Installing dependencies for static page"
   - cd web
   - npm ci
   - npm run build
+  - cd ..
+  - echo "Installing dependencies for functions"
+  - cd functions
+  - npm ci
   - cd ..
 
 deploy:
