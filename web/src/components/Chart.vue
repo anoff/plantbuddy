@@ -80,10 +80,31 @@ export default {
         data: this.values.map(v => v.temp)
       })
       collection.datasets.push({
+        label: 'Temperature (OWM)',
+        borderColor: 'rgb(247, 173, 27)',
+        backgroundColor: 'rgb(247, 173, 27, 0.2)',
+        data: this.values.map(v => v.weather.main.temp)
+      })
+      collection.datasets.push({
+        label: 'Cloudiness (OWM)',
+        hidden: true,
+        borderColor: 'rgb(90, 90, 90)',
+        backgroundColor: 'rgb(90, 90, 90, 0.2)',
+        data: this.values.map(v => v.weather.clouds.all)
+      })
+      collection.datasets.push({
         label: 'Humidity',
+        hidden: true,
         borderColor: 'rgb(66, 134, 244)',
         backgroundColor: 'rgb(66, 134, 244, 0.2)',
         data: this.values.map(v => v.humidity)
+      })
+      collection.datasets.push({
+        label: 'Humidity (OWM)',
+        hidden: true,
+        borderColor: 'rgb(27, 188, 247)',
+        backgroundColor: 'rgb(27, 188, 247, 0.2)',
+        data: this.values.map(v => v.weather.main.humidity)
       })
       collection.datasets.push({
         label: 'Moisture',
@@ -99,7 +120,9 @@ export default {
     return db.collection('data').orderBy('date', 'desc').get()
     .then(snapshot => {
       const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
-      this.values = values.filter((e, ix) => ix%3 === 0)
+      this.values = values
+      .filter(v => v.weather)
+      .filter((e, ix) => ix%3 === 0)
       this.loaded = true
     })
   }
