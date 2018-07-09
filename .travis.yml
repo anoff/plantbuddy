@@ -6,6 +6,7 @@ script:
   - cd web
   - npm ci
   - npm run build
+  - cd ..
 
 deploy:
   provider: firebase
