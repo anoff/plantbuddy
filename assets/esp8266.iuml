@@ -2,6 +2,7 @@
 !includeurl https://gist.githubusercontent.com/anoff/c531251183cf9590b0f86ac85d5bc353/raw/fancy.plantuml
 start
 :initialize Serial connection;
+:power up sensors;
 
 :connecto to WiFi;
 while (connection) is (not established)
@@ -9,10 +10,12 @@ while (connection) is (not established)
 endwhile (successful)
 :submit heartbeat;
 
+:wait 2s;
 :read moisture level;
 :read humidty + temperature;
 while (sensor readings) is (invalid)
   :wait 2s;
+  :read moisture level;
   :read humidty + temperature;
   :increase counter;
   if (MAX_READING_RETRIES reached) then (yes)
@@ -21,6 +24,7 @@ while (sensor readings) is (invalid)
 endwhile (valid)
 :submit sensor data;
 
+:power off sensors;
 :send controller to deep sleep;
 end
 @enduml

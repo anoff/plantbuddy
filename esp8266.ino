@@ -3,26 +3,34 @@
 #include <DHT.h>
 #include "esp8266.secrets.c"
 
-#define PIN_MOISTURE 0 // moisture sensor analog on PIN 0
-#define PIN_DHT 4 // temp + humidity sensor
+#define PIN_MOISTURE_READ 0 // moisture sensor analog on PIN 0
+#define PIN_MOISTURE_POWER 12 // D6
+#define PIN_DHT_READ 4 // D2, temp + humidity sensor
+#define PIN_DHT_POWER 13 // D7
 #define DHT_TYPE DHT22
-#define SLEEP_S 300 // how many seconds to sleep between readings
+#define SLEEP_S 900 // how many seconds to sleep between readings
 #define DEVICE_ID "plantbuddy1"
 #define MAX_READING_RETRIES 10 // maximum number of retries when getting NaN values from sensor
 
-DHT dht(PIN_DHT, DHT_TYPE);
+DHT dht(PIN_DHT_READ, DHT_TYPE);
 
 void setup() {
+  pinMode(PIN_DHT_POWER, OUTPUT);
+  pinMode(PIN_MOISTURE_POWER, OUTPUT);
   Serial.begin(115200);
   Serial.println("Starting setup");
+  delay(100);
+  digitalWrite(PIN_DHT_POWER, HIGH);
+  digitalWrite(PIN_MOISTURE_POWER, HIGH);
   wifiConnect(WIFI_SSID, WIFI_KEY);
   // submit heartbeat
   Serial.println("Sending heartbeat..");
   int httpBeat = submitHeartbeat(POST_URL, DEVICE_ID);
   Serial.print("Heartbeat HTTP Response: ");
   Serial.println(httpBeat);
+  delay(2000); // wait for DHT to power up?
   // read sensor values
-  float moisture = getMoistureLevel(PIN_MOISTURE);
+  float moisture = getMoistureLevel(PIN_MOISTURE_READ);
   float humidity = dht.readHumidity();
   float temp = dht.readTemperature(false);
   float heatIndex = dht.computeHeatIndex(temp, humidity, false);
@@ -30,14 +38,14 @@ void setup() {
   while (isnan(humidity) || isnan(temp) || isnan(heatIndex)) {
     Serial.println("Error while reading sensor values, retrying");
     delay(2000);
-    moisture = getMoistureLevel(PIN_MOISTURE);
+    moisture = getMoistureLevel(PIN_MOISTURE_READ);
     humidity = dht.readHumidity();
     temp = dht.readTemperature(false);
     heatIndex = dht.computeHeatIndex(temp, humidity, false);
     count++;
     // force ESP into deepsleep so heartbeat gets out in case of permanent sensor damage
     if (count > MAX_READING_RETRIES) {
-      ESP.deepSleep(SLEEP_S * 1000000);
+      shutdown();
     }
   }
   logSensorStatus(moisture, temp, humidity, heatIndex);
@@ -45,12 +53,18 @@ void setup() {
   int httpCode = submitSensorStatus(POST_URL, moisture, temp, humidity, heatIndex);
   Serial.print("Sensor data HTTP response: ");
   Serial.println(httpCode);
-  ESP.deepSleep(SLEEP_S * 1000000);
+
+  shutdown();
 }
 
 void loop() {
 }
 
+void shutdown() {
+  digitalWrite(PIN_DHT_POWER, LOW);
+  digitalWrite(PIN_MOISTURE_POWER, LOW);
+  ESP.deepSleep(SLEEP_S * 1000000);
+}
 float getMoistureLevel(int PIN) {
   float moisture;
   moisture = analogRead(PIN);
