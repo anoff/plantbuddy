@@ -69,6 +69,19 @@ firebase functions:config:get > functions/.runtimeconfig.json
 # start function host locally
 firebase serve --only functions
 ```
+
+## Deployment
+
+All the Firebase stuff gets automatically deployed via Travis CI. To set it up create a encrypted token and update the [Travis CI Config](.travis.yml).
+
+```sh
+# create a firebase CI token
+firebase login:ci
+
+# encrypt the token to your project
+docker run --rm caktux/travis-cli encrypt "<token from firebase login:ci>" -r anoff/plantbuddy
+```
+
 ## Useful links
 
 - https://openhomeautomation.net/esp8266-battery

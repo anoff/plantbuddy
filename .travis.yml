@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+  - "10"
+
+script:
+  - cd web
+  - npm run build
+
+deploy:
+  provider: firebase
+  token:
+    secure: "yYNRIXA66swJ59KHkeaPOUxoF3p9ENrc/AK1fsc5BevDPndW+GdOWZ8rYRtwXPSNKySD0/27tre8uj4gFRXfFiuOigOa+LGbkUXR3Aj+ncKt0kXubNbISXQy88SOYju3myThJyr2hxqg73tTiKajZeHEDTmEqXcKFy58UFeENQdbfrtkoRttEK3sjxRyCwJISKCEObfhvZGDF9Aph18W2R4zGPWR3FeE7VMj0FH62P5mqiesCMRna7LOUfxRnUsBKTbY5gk9uP92WUm63opQnG8R0VjMmAgwqtUPU8Ui5iqTrMXYy4GgR7vVhLq0j4jBuK3+Ao6uFPK+2lVf8hOytcOldrh/US558wz+QemnvFIYH5uc8keCTOzrXRvu7Jxx6wYOSkH9X0wMxNXz6QN8+SuBevfIVZ7PGDFFnOYHLZM8i7/IhAgJN+PPgKpaUv0HqxO9vusnhWkj2jjZ7Po8fdkyHBlnKTUV/7em94pFf4kKrmWRVwSU+HPHVlbSn6spTBl53dnstXlbhh/FEl1ssu3gnhKzL4wpPjWVobTgjg18DZzHxLMxsU0wpueIfIiYHvF1a9F+1uwYC1T6xuxWLAGIAdb56uHPwWCX+yJ8slLfKILxPYq+O9g5wHpM1bhjgJcNUEeVonoEu5A/pMnkHXlwIYzH/QbNPRgubgi/SpA="
+  project: plantbuddy-9b971
+  skip_cleanup: true
+  on:
+all_branches: true
