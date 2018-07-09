@@ -1,10 +1,16 @@
 <template>
   <v-container fluid>
     <v-layout>
-      <v-flex xs12 md6>
+      <v-progress-circular
+        :width="5"
+        color="accent"
+        indeterminate
+        v-if="!loaded"
+      ></v-progress-circular>
+      <v-flex xs12 md8 v-if="loaded">
         <line-chart :chartData="dataCollection" :chartOptions="chartOptions"></line-chart>
       </v-flex>
-      <v-flex xs12 md6>
+      <v-flex xs12 md4>
             <v-chip color="primary" text-color="white">Primary</v-chip>
 
     <v-chip color="secondary" text-color="white">Secondary</v-chip>
