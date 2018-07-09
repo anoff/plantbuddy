@@ -11,13 +11,6 @@
         <line-chart :chartData="dataCollection" :chartOptions="chartOptions"></line-chart>
       </v-flex>
       <v-flex xs12 md4>
-            <v-chip color="primary" text-color="white">Primary</v-chip>
-
-    <v-chip color="secondary" text-color="white">Secondary</v-chip>
-
-    <v-chip color="red" text-color="white">Colored Chip</v-chip>
-
-    <v-chip color="green" text-color="white">Colored Chip</v-chip>
       </v-flex>
     </v-layout>
   </v-container>
