@@ -2,15 +2,26 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-import BootstrapVue from 'bootstrap-vue'
+import Vuetify from 'vuetify'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import router from './router'
-import './scss/custom.scss'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'vuetify/dist/vuetify.min.css'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import colors from 'vuetify/es5/util/colors'
 Vue.config.productionTip = false
 
-Vue.use(BootstrapVue)
+Vue.use(Vuetify, {
+  theme: {
+    primary: colors.lightGreen.base,
+    secondary: colors.green.darken2,
+    accent: colors.cyan.darken1,
+    error: colors.red.darken4,
+    warning: colors.orange.accent3,
+    info: colors.lightBlue.base,
+    success: colors.green.accent4
+  }
+})
 
 firebase.initializeApp({
   projectId: 'plantbuddy-9b971',

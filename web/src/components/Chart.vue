@@ -1,7 +1,20 @@
 <template>
-  <b-container>
-    <line-chart :chartData="dataCollection" :chartOptions="chartOptions"></line-chart>
-  </b-container>
+  <v-container fluid>
+    <v-layout>
+      <v-flex xs12 md6>
+        <line-chart :chartData="dataCollection" :chartOptions="chartOptions"></line-chart>
+      </v-flex>
+      <v-flex xs12 md6>
+            <v-chip color="primary" text-color="white">Primary</v-chip>
+
+    <v-chip color="secondary" text-color="white">Secondary</v-chip>
+
+    <v-chip color="red" text-color="white">Colored Chip</v-chip>
+
+    <v-chip color="green" text-color="white">Colored Chip</v-chip>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>

@@ -1,10 +1,10 @@
 <template>
-  <div id="app">
-    <b-navbar variant="primary">
-      <b-navbar-brand href="#">Plantbuddy</b-navbar-brand>
-    </b-navbar>
+  <v-app>
+    <v-toolbar color="primary">
+      <v-toolbar-title class="title" href="#">Plantbuddy</v-toolbar-title>
+    </v-toolbar>
     <router-view/>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -14,7 +14,7 @@ export default {
 </script>
 
 <style>
-.navbar-brand {
+.v-toolbar .title {
   font-weight: bold;
   text-transform: uppercase;
 }
