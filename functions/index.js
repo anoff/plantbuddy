@@ -51,7 +51,7 @@ exports.aggregateHour = functions.firestore
   .document('data/{entryId}')
   .onCreate((snapshot, context) => {
     const data = snapshot.data()
-    if (data.aggregate === 'hour') return null
+    if (data.aggregate) return null
     const date = data.date
     const hourStart = new Date(date)
     hourStart.setMinutes(0)
@@ -110,7 +110,7 @@ exports.aggregateHour = functions.firestore
   })
 
 // create daily aggregates
-exports.aggregateDailyr = functions.firestore
+exports.aggregateDay = functions.firestore
   .document('data/{entryId}')
   .onCreate((snapshot, context) => {
     const data = snapshot.data()
