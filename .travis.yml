@@ -4,6 +4,7 @@ node_js:
 
 script:
   - cd web
+  - npm ci
   - npm run build
 
 deploy:
