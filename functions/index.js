@@ -31,6 +31,8 @@ exports.newData = functions.https.onRequest((req, res) => {
 exports.fetchWeather = functions.firestore
   .document('data/{entryId}')
   .onCreate((snapshot, context) => {
+    const data = snapshot.data()
+    if (data.aggregate) return null
     const cityId = functions.config().owm.city_id
     const apiKey = functions.config().owm.key
 
