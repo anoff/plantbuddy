@@ -51,19 +51,22 @@ exports.fetchWeather = functions.firestore
 // create hourly aggregates
 exports.aggregateHour = functions.firestore
   .document('data/{entryId}')
-  .onCreate((snapshot, context) => {
+  .onUpdate((snapshot, context) => {
     const data = snapshot.data()
     if (data.aggregate) return null
     const date = data.date
     const hourStart = new Date(date)
     hourStart.setMinutes(0)
     hourStart.setSeconds(0)
+    hourStart.setMilliseconds(0)
     const hourEnd = new Date(date)
     hourEnd.setMinutes(59)
     hourEnd.setSeconds(59)
+    hourEnd.setMilliseconds(999)
     const hourId = new Date(date)
     hourId.setMinutes(30)
     hourId.setSeconds(0)
+    hourId.setMilliseconds(0)
     return admin.firestore().collection('data')
       .where('date', '>=', hourStart.toISOString())
       .where('date', '<=', hourEnd.toISOString())
@@ -77,6 +80,7 @@ exports.aggregateHour = functions.firestore
             p.humidity += c.humidity
             p.moisture += c.moisture
             p.temp += c.temp
+            if (!p.weather || !p.weather.main || !p.weather.clouds || !p.weather.clouds.all) return p
             p.weather.clouds.all += c.weather.clouds.all
             p.weather.main.humidity += c.weather.main.humidity
             p.weather.main.pressure += c.weather.main.pressure
