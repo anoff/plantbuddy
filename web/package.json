@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.2",
+    "chartjs-plugin-zoom": "^0.6.3",
     "firebase": "^5.2.0",
     "material-design-icons-iconfont": "^3.0.3",
     "vue": "^2.5.2",
