@@ -11,6 +11,7 @@
         <line-chart :chartData="dataCollection" :chartOptions="chartOptions" :zoomLevel="zoomLevel"></line-chart>
       </v-flex>
       <v-flex xs12 md4>
+        <span>Zoom Level: {{zoomLevel}}</span>
         <v-btn flat icon v-on:click.stop="zoomLevel = Math.max(1, zoomLevel - 1)">
           <v-icon>zoom_in</v-icon>
         </v-btn>

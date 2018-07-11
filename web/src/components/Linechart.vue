@@ -13,7 +13,6 @@ export default {
   },
   watch: {
     zoomLevel () {
-      console.log('Zoom change', this.zoomLevel)
       let timeSpan // timespan to show on screen [hours]
       switch (this.zoomLevel) {
         case 6:
@@ -36,9 +35,9 @@ export default {
           break
       }
       const xOpts = this.$data._chart.options.scales.xAxes[0]
-      // TODO: Orient min/max around the current center
-      xOpts.time.max = new Date()
-      xOpts.time.min = new Date(Date.now() - timeSpan * 3600 * 1000)
+      const center = (xOpts.time.max.getTime() - xOpts.time.min.getTime()) / 2 + xOpts.time.min.getTime()
+      xOpts.time.max = new Date(center + timeSpan / 2 * 3600 * 1000)
+      xOpts.time.min = new Date(center - timeSpan / 2 * 3600 * 1000)
       this.$data._chart.update()
     }
   },
