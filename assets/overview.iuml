@@ -11,6 +11,7 @@ skinparam defaultTextAlignment center
 DEV_FIREBASE(db, database, database)
 DEV_FIREBASE(http_func, HTTP endpoint, node)
 DEV_FIREBASE(weather_func, Weather Query, node)
+DEV_FIREBASE(aggregate_func, Aggregate Hour/Day, node)
 FA5_MICROCHIP(uc, ESP8266, node)
 FA5_CHART_BAR(sensors, sensors, card)
 WEATHER_DAY_RAIN_MIX(weather, OpenWeatherMap, card)
@@ -27,4 +28,6 @@ db ..> weather_func: trigger weather query
 weather_func -> db: enrich sensor reading\nwith weather data
 weather_func ..> weather: fetch current weather
 weather_func <- weather
+db ..> aggregate_func: trigger aggregation by doc update
+aggregate_func -> db: create hourly/daily aggregates
 @enduml

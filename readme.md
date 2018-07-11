@@ -22,7 +22,7 @@ The hardware setup consists of a [ESP8266](https://en.wikipedia.org/wiki/ESP8266
 
 > To program the ESP8266 you need to clear the connection to **RST**
 
-[<img src="sketch.png" height="600px" alt="Fritzing diagram"/>](sketch.png)
+[<img src="assets/sketch.png" height="600px" alt="Fritzing diagram"/>](assets/sketch.png)
 
 ### Power consumption
 
