@@ -8,7 +8,7 @@
         v-if="!loaded"
       ></v-progress-circular>
       <v-flex xs12 md8 v-if="loaded">
-        <line-chart :chartData="dataCollection" :chartOptions="chartOptions" :zoomLevel="zoomLevel"></line-chart>
+        <line-chart :chartData="dataCollection" :chartOptions="chartOptions" :zoomLevel="zoomLevel" ref="line"></line-chart>
       </v-flex>
       <v-flex xs12 md4>
         <span>Zoom Level: {{zoomLevel}}</span>
@@ -17,6 +17,12 @@
         </v-btn>
         <v-btn flat icon v-on:click.stop="zoomLevel = Math.min(6, zoomLevel + 1)">
           <v-icon>zoom_out</v-icon>
+        </v-btn>
+        <v-btn flat icon v-on:click.stop="$refs.line.pan(-0.3)">
+          <v-icon>chevron_left</v-icon>
+        </v-btn>
+        <v-btn flat icon v-on:click.stop="$refs.line.pan(0.3)">
+          <v-icon>chevron_right</v-icon>
         </v-btn>
       </v-flex>
     </v-layout>
@@ -34,7 +40,8 @@ export default {
   data () {
     return {
       values: [],
-      zoomLevel: 3,
+      zoomLevel: 2,
+      pan: 0,
       loaded: false,
       chartOptions: {
         scales: {
@@ -54,9 +61,7 @@ export default {
                 minute: 'HH:mm',
                 hour: 'HH:mm'
               },
-              tooltipFormat: 'YYYY-MM-DD HH:mm',
-              min: new Date(Date.now() - 3 * 24*3600*1000),
-              max: new Date()
+              tooltipFormat: 'YYYY-MM-DD HH:mm'
             },
             gridLines: {
               display: false
@@ -76,8 +81,8 @@ export default {
         responsive: true,
         maintainAspectRatio: false,
         pan: {
-          enabled: false,
-          mode: 'x'
+          enabled: true,
+          mode: 'xy'
         }
       }
     }
