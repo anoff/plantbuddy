@@ -52,7 +52,7 @@ exports.fetchWeather = functions.firestore
 exports.aggregateHour = functions.firestore
   .document('data/{entryId}')
   .onUpdate((snapshot, context) => {
-    const data = snapshot.data()
+    const data = snapshot.after.data()
     if (data.aggregate) return null
     const date = data.date
     const hourStart = new Date(date)
