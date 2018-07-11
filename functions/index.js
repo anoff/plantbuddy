@@ -21,7 +21,7 @@ exports.newData = functions.https.onRequest((req, res) => {
   const type = req.body.type
   const doc = JSON.parse(JSON.stringify(req.body))
   doc.date = new Date().toISOString()
-  admin.firestore().collection(type).add(doc)
+  return admin.firestore().collection(type).add(doc)
     .then(doc => {
       res.send(`Created entry ${doc.id} under /${type}`)
     })
@@ -80,7 +80,7 @@ exports.aggregateHour = functions.firestore
             p.humidity += c.humidity
             p.moisture += c.moisture
             p.temp += c.temp
-            if (!p.weather || !p.weather.main || !p.weather.clouds || !p.weather.clouds.all) return p
+            if (!c.weather || !c.weather.main || !c.weather.clouds || !c.weather.clouds.all) return p
             p.weather.clouds.all += c.weather.clouds.all
             p.weather.main.humidity += c.weather.main.humidity
             p.weather.main.pressure += c.weather.main.pressure
@@ -126,14 +126,17 @@ exports.aggregateDay = functions.firestore
     aggregateStart.setHours(0)
     aggregateStart.setMinutes(0)
     aggregateStart.setSeconds(0)
+    aggregateStart.setMilliseconds(0)
     const aggregateEnd = new Date(date)
     aggregateEnd.setHours(23)
     aggregateEnd.setMinutes(59)
     aggregateEnd.setSeconds(59)
+    aggregateEnd.setMilliseconds(0)
     const aggregateId = new Date(date)
     aggregateId.setHours(12)
     aggregateId.setMinutes(0)
     aggregateId.setSeconds(0)
+    aggregateId.setMilliseconds(0)
     return admin.firestore().collection('data')
       .where('date', '>=', aggregateStart.toISOString())
       .where('date', '<=', aggregateEnd.toISOString())
