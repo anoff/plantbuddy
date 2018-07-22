@@ -11,11 +11,11 @@
         <line-chart :chartData="dataCollection" :timeFrom="timeFrom" :timeUntil="timeUntil" ref="line"></line-chart>
       </v-flex>
       <v-flex xs12 md4>
-        <span>Zoom Level: {{chart.zoomLevel}}</span>
-        <v-btn flat icon v-on:click.stop="chart.zoomLevel = Math.max(chart.zoomMin, chart.zoomLevel - 1)">
+        <span>Zoom Level: {{zoomLevel}}</span>
+        <v-btn flat icon v-on:click.stop="zoomLevel = Math.max(chart.zoomMin, zoomLevel - 1)">
           <v-icon>zoom_in</v-icon>
         </v-btn>
-        <v-btn flat icon v-on:click.stop="chart.zoomLevel = Math.min(chart.zoomMax, chart.zoomLevel + 1)">
+        <v-btn flat icon v-on:click.stop="zoomLevel = Math.min(chart.zoomMax, zoomLevel + 1)">
           <v-icon>zoom_out</v-icon>
         </v-btn>
         <v-btn flat icon v-on:click.stop="pan(-0.3)">
@@ -40,8 +40,8 @@ export default {
   data () {
     return {
       values: [],
+      zoomLevel: 2,
       chart: {
-        zoomLevel: 2,
         zoomMin: 1,
         zoomMax: 6
       },
@@ -96,7 +96,7 @@ export default {
     },
     timeSpan () {
       let timeSpan // timespan to show on screen [hours]
-      switch (this.chart.zoomLevel) {
+      switch (this.zoomLevel) {
         case 6:
           timeSpan = 24 * 30 * 3
           break
@@ -123,37 +123,47 @@ export default {
     }
   },
   mounted () {
-    return db.collection('data')
-    .where("aggregate", "==", "hour")
-    .orderBy('id', 'desc')
-    .get()
-    .then(snapshot => {
-      const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
-      this.values = values
-      .filter(v => v.weather)
-      this.loading = false
-    })
+    this.loadData (this.timeFrom, this.timeUntil)
+      .then(val => this.values = val)
   },
   methods: {
     loadData (from, until) {
+      if (typeof from === 'object') {
+        from = from.toISOString()
+      }
+      if (typeof until === 'object') {
+        until = until.toISOString()
+      }
       this.loading = true
       return db.collection('data')
-        .where("aggregate", "==", "hour")
-        .where("id", "<=", until)
-        .where("id", ">=", from)
-        .orderBy('id', 'desc')
+        .where('aggregate', '==', 'hour')
+        .where('__name__', '<=', until)
+        .where('__name__', '>=', from)
+        .orderBy('__name__', 'desc')
         .get()
         .then(snapshot => {
           const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
-          this.values = values
-          .filter(v => v.weather)
           this.loading = false
+          return values.filter(v => v.weather)
       })
     },
     // pan left/right by given percentage (-1 .. 1)
     pan (percent = 0) {
+      const prevFrom = this.timeFrom
+      const prevUntil = this.timeUntil
       const timeSpan = this.timeSpan * 3600 * 1000
       this.timeUntil = new Date(this.timeUntil.getTime() + percent * timeSpan)
+      if (percent < 0) {
+        // TODO: proper logic to identify unknown data points
+        this.loadData (this.timeFrom, prevFrom)
+          .then(val => this.values = this.values.concat(val))
+      }
+    }
+  },
+  watch: {
+    zoomLevel () {
+      this.loadData (this.timeFrom, this.timeUntil)
+      .then(val => this.values = val)
     }
   }
 }
