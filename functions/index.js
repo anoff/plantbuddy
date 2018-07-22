@@ -143,7 +143,7 @@ exports.aggregateDay = functions.firestore
     aggregateEnd.setHours(23)
     aggregateEnd.setMinutes(59)
     aggregateEnd.setSeconds(59)
-    aggregateEnd.setMilliseconds(0)
+    aggregateEnd.setMilliseconds(999)
     const aggregateId = new Date(date)
     aggregateId.setHours(12)
     aggregateId.setMinutes(0)

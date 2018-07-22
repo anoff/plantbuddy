@@ -5,23 +5,23 @@
         :width="5"
         color="accent"
         indeterminate
-        v-if="!loaded"
+        v-if="loading"
       ></v-progress-circular>
-      <v-flex xs12 md8 v-if="loaded">
-        <line-chart :chartData="dataCollection" :chartOptions="chartOptions" :zoomLevel="zoomLevel" ref="line"></line-chart>
+      <v-flex xs12 md8 >
+        <line-chart :chartData="dataCollection" :timeFrom="timeFrom" :timeUntil="timeUntil" ref="line"></line-chart>
       </v-flex>
       <v-flex xs12 md4>
-        <span>Zoom Level: {{zoomLevel}}</span>
-        <v-btn flat icon v-on:click.stop="zoomLevel = Math.max(1, zoomLevel - 1)">
+        <span>Zoom Level: {{chart.zoomLevel}}</span>
+        <v-btn flat icon v-on:click.stop="chart.zoomLevel = Math.max(chart.zoomMin, chart.zoomLevel - 1)">
           <v-icon>zoom_in</v-icon>
         </v-btn>
-        <v-btn flat icon v-on:click.stop="zoomLevel = Math.min(6, zoomLevel + 1)">
+        <v-btn flat icon v-on:click.stop="chart.zoomLevel = Math.min(chart.zoomMax, chart.zoomLevel + 1)">
           <v-icon>zoom_out</v-icon>
         </v-btn>
-        <v-btn flat icon v-on:click.stop="$refs.line.pan(-0.3)">
+        <v-btn flat icon v-on:click.stop="pan(-0.3)">
           <v-icon>chevron_left</v-icon>
         </v-btn>
-        <v-btn flat icon v-on:click.stop="$refs.line.pan(0.3)">
+        <v-btn flat icon v-on:click.stop="pan(0.3)">
           <v-icon>chevron_right</v-icon>
         </v-btn>
       </v-flex>
@@ -40,59 +40,18 @@ export default {
   data () {
     return {
       values: [],
-      zoomLevel: 2,
-      pan: 0,
-      loaded: false,
-      chartOptions: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              suggestedMax: 100
-            },
-            gridLines: {
-              display: true
-            }
-          }],
-          xAxes: [ {
-            type: 'time',
-            time: {
-              displayFormats: {
-                minute: 'HH:mm',
-                hour: 'HH:mm'
-              },
-              tooltipFormat: 'YYYY-MM-DD HH:mm'
-            },
-            gridLines: {
-              display: false
-            }
-          }]
-        },
-        tooltips: {
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          titleFontColor: '#333',
-          displayColors: false,
-          bodyFontColor: '#000',
-          footerFontColor: '#333'
-        },
-        legend: {
-          display: true
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        pan: {
-          enabled: true,
-          mode: 'xy'
-        }
-      }
+      chart: {
+        zoomLevel: 2,
+        zoomMin: 1,
+        zoomMax: 6
+      },
+      timeUntil: new Date(), // timeFrom is a computed value
+      loading: false
     }
   },
   computed: {
     dataCollection: function () {
       const collection = { labels: this.values.map(v => new Date(v.date)), datasets: [] }
-      const datasetStyle = {
-
-      }
       collection.datasets.push({
         label: 'Temperature',
         borderColor: 'rgb(255, 88, 28)',
@@ -134,17 +93,68 @@ export default {
         data: this.values.map(v => 100 - Math.min(100, v.moisture))
       })
       return collection
+    },
+    timeSpan () {
+      let timeSpan // timespan to show on screen [hours]
+      switch (this.chart.zoomLevel) {
+        case 6:
+          timeSpan = 24 * 30 * 3
+          break
+        case 5:
+          timeSpan = 24 * 30
+          break
+        case 4:
+          timeSpan = 24 * 14
+          break
+        case 3:
+          timeSpan = 24 * 7
+          break
+        case 2:
+          timeSpan = 24 * 3
+          break
+        case 1:
+          timeSpan = 24 * 1
+          break
+      }
+      return timeSpan
+    },
+    timeFrom () {
+      return new Date(this.timeUntil - this.timeSpan * 60 * 60 * 1000)
     }
   },
   mounted () {
-    return db.collection('data').orderBy('date', 'desc').get()
+    return db.collection('data')
+    .where("aggregate", "==", "hour")
+    .orderBy('id', 'desc')
+    .get()
     .then(snapshot => {
-      const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
+      const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
       this.values = values
       .filter(v => v.weather)
-      .filter((e, ix) => ix%3 === 0)
-      this.loaded = true
+      this.loading = false
     })
+  },
+  methods: {
+    loadData (from, until) {
+      this.loading = true
+      return db.collection('data')
+        .where("aggregate", "==", "hour")
+        .where("id", "<=", until)
+        .where("id", ">=", from)
+        .orderBy('id', 'desc')
+        .get()
+        .then(snapshot => {
+          const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
+          this.values = values
+          .filter(v => v.weather)
+          this.loading = false
+      })
+    },
+    // pan left/right by given percentage (-1 .. 1)
+    pan (percent = 0) {
+      const timeSpan = this.timeSpan * 3600 * 1000
+      this.timeUntil = new Date(this.timeUntil.getTime() + percent * timeSpan)
+    }
   }
 }
 
