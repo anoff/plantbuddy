@@ -53,7 +53,7 @@ exports.aggregateHour = functions.firestore
   .document('data/{entryId}')
   .onUpdate((snapshot, context) => {
     const data = snapshot.after.data()
-    if (data.aggregate) return null
+    if (data.aggregate || !data.weather) return null
     const date = data.date
     const hourStart = new Date(date)
     hourStart.setMinutes(0)
@@ -70,7 +70,6 @@ exports.aggregateHour = functions.firestore
     return admin.firestore().collection('data')
       .where('date', '>=', hourStart.toISOString())
       .where('date', '<=', hourEnd.toISOString())
-      .where('id', '==', data.id)
       .get()
       .then(snapshot => {
         const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
@@ -141,7 +140,6 @@ exports.aggregateDay = functions.firestore
     return admin.firestore().collection('data')
       .where('date', '>=', aggregateStart.toISOString())
       .where('date', '<=', aggregateEnd.toISOString())
-      .where('id', '==', data.id)
       .where('aggregate', '==', 'hour')
       .get()
       .then(snapshot => {
