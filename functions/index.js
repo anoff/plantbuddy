@@ -110,6 +110,7 @@ exports.aggregateHour = functions.firestore
         aggregate.weather.main.pressure /= numElems
         aggregate.weather.main.temp /= numElems
         aggregate.weather.wind.speed /= numElems
+        aggregate.date = hourId.toISOString()
 
         return admin.firestore().collection('data').doc(hourId.toISOString()).set(aggregate)
       })
@@ -179,6 +180,7 @@ exports.aggregateDay = functions.firestore
         aggregate.weather.main.pressure /= numElems
         aggregate.weather.main.temp /= numElems
         aggregate.weather.wind.speed /= numElems
+        aggregate.date = aggregateId.toISOString()
 
         return admin.firestore().collection('data').doc(aggregateId.toISOString()).set(aggregate)
       })
