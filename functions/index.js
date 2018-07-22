@@ -128,7 +128,7 @@ exports.aggregateHour = functions.firestore
 exports.aggregateDay = functions.firestore
   .document('data/{entryId}')
   .onUpdate((snapshot, context) => {
-    const data = snapshot.data()
+    const data = snapshot.after.data()
     if (data.aggregate !== 'hour') {
       console.log('Interrupted function execution')
       return null
