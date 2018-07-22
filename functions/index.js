@@ -32,7 +32,10 @@ exports.fetchWeather = functions.firestore
   .document('data/{entryId}')
   .onCreate((snapshot, context) => {
     const data = snapshot.data()
-    if (data.aggregate) return null
+    if (data.aggregate) {
+      console.log('Interrupted function execution')
+      return null
+    }
     const cityId = functions.config().owm.city_id
     const apiKey = functions.config().owm.key
 
@@ -121,6 +124,7 @@ exports.aggregateHour = functions.firestore
   })
 
 // create daily aggregates
+// due to onUpdate will not run on the first hour aggregation; should be fine if base interval is <30min
 exports.aggregateDay = functions.firestore
   .document('data/{entryId}')
   .onUpdate((snapshot, context) => {
