@@ -53,7 +53,10 @@ exports.aggregateHour = functions.firestore
   .document('data/{entryId}')
   .onUpdate((snapshot, context) => {
     const data = snapshot.after.data()
-    if (data.aggregate || !data.weather) return null
+    if (data.aggregate || !data.weather) {
+      console.log('Interrupted function execution')
+      return null
+    }
     const date = data.date
     const hourStart = new Date(date)
     hourStart.setMinutes(0)
@@ -67,6 +70,7 @@ exports.aggregateHour = functions.firestore
     hourId.setMinutes(30)
     hourId.setSeconds(0)
     hourId.setMilliseconds(0)
+    console.log(`Aggregating from ${hourStart.toISOString()} until ${hourEnd.toISOString()}`)
     return admin.firestore().collection('data')
       .where('date', '>=', hourStart.toISOString())
       .where('date', '<=', hourEnd.toISOString())
@@ -111,6 +115,7 @@ exports.aggregateHour = functions.firestore
         aggregate.weather.wind.speed /= numElems
         aggregate.date = hourId.toISOString()
 
+        console.log(`Storing aggregate ${hourId.toISOString()}`)
         return admin.firestore().collection('data').doc(hourId.toISOString()).set(aggregate)
       })
   })
@@ -118,9 +123,12 @@ exports.aggregateHour = functions.firestore
 // create daily aggregates
 exports.aggregateDay = functions.firestore
   .document('data/{entryId}')
-  .onCreate((snapshot, context) => {
+  .onUpdate((snapshot, context) => {
     const data = snapshot.data()
-    if (data.aggregate !== 'hour') return null
+    if (data.aggregate !== 'hour') {
+      console.log('Interrupted function execution')
+      return null
+    }
     const date = data.date
     const aggregateStart = new Date(date)
     aggregateStart.setHours(0)
