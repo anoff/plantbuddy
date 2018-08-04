@@ -6,8 +6,8 @@ import Vuetify from 'vuetify'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import router from './router'
-import 'vuetify/dist/vuetify.min.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import 'vuetify/dist/vuetify.min.css'
 import colors from 'vuetify/es5/util/colors'
 Vue.config.productionTip = false
 

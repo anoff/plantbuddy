@@ -1,32 +1,39 @@
 <template>
+<div>
+  <div id="progressContainer">
+    <v-progress-linear
+      height="20"
+      color="accent"
+      indeterminate
+      v-if="loading"
+    ></v-progress-linear>
+  </div>
   <v-container fluid>
-    <v-layout>
-      <v-progress-circular
-        :width="5"
-        color="accent"
-        indeterminate
-        v-if="loading"
-      ></v-progress-circular>
-      <v-flex xs12 md8 >
-        <line-chart :chartData="dataCollection" :timeFrom="timeFrom" :timeUntil="timeUntil" ref="line"></line-chart>
-      </v-flex>
-      <v-flex xs12 md4>
-        <span>Zoom Level: {{zoomLevel}}</span>
-        <v-btn flat icon v-on:click.stop="zoomLevel = Math.max(chart.zoomMin, zoomLevel - 1)">
-          <v-icon>zoom_in</v-icon>
-        </v-btn>
-        <v-btn flat icon v-on:click.stop="zoomLevel = Math.min(chart.zoomMax, zoomLevel + 1)">
-          <v-icon>zoom_out</v-icon>
-        </v-btn>
-        <v-btn flat icon v-on:click.stop="pan(-0.3)">
-          <v-icon>chevron_left</v-icon>
-        </v-btn>
-        <v-btn flat icon v-on:click.stop="pan(0.3)">
-          <v-icon>chevron_right</v-icon>
-        </v-btn>
+    <v-layout row wrap justify-space-around>
+      <v-flex xs12>
+        <line-chart :chartData="dataCollection" :timeFrom="timeFrom" :timeUntil="timeUntil" ref="line">
+        </line-chart>
+        <div id="actions">
+          <v-btn id="zoomlevel" fab disabled>
+          {{zoomLevel}}
+          </v-btn>
+          <v-btn id="action-top" fab small color="accent" v-on:click.stop="zoomLevel = Math.max(chart.zoomMin, zoomLevel - 1)">
+            <v-icon>zoom_in</v-icon>
+          </v-btn>
+          <v-btn id="action-bottom" fab small color="accent" v-on:click.stop="zoomLevel = Math.min(chart.zoomMax, zoomLevel + 1)">
+            <v-icon>zoom_out</v-icon>
+          </v-btn>
+          <v-btn id="action-left" fab small color="accent" v-on:click.stop="pan(-0.3)">
+            <v-icon>chevron_left</v-icon>
+          </v-btn>
+          <v-btn id="action-right" fab small color="accent" v-on:click.stop="pan(0.3)">
+            <v-icon>chevron_right</v-icon>
+          </v-btn>
+        </div>
       </v-flex>
     </v-layout>
   </v-container>
+</div>
 </template>
 
 <script>
@@ -222,4 +229,45 @@ export default {
 
 <style scoped>
 
+#progressContainer {
+  min-height: 20px;
+}
+.v-progress-linear {
+  margin: 0;
+}
+.container {
+  padding-top: 0;
+}
+
+#actions {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 80px;
+  right: 50px;
+}
+#action-top {
+  top: 0px;
+  left: 32px;
+}
+#action-bottom {
+  bottom: 0px;
+  left: 32px;
+}
+#action-left {
+  top: 33px;
+  left: 0px;
+}
+#action-right {
+  top: 33px;
+  right: 0px;
+}
+#actions .v-btn {
+  position: absolute;
+}
+#zoomlevel {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+}
 </style>
