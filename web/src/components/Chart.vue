@@ -124,7 +124,9 @@ export default {
   },
   mounted () {
     this.loadData (this.timeFrom, this.timeUntil)
-      .then(val => this.values = val)
+      .then(val => {
+        this.values = val
+      })
   },
   methods: {
     loadData (from, until) {
@@ -135,17 +137,52 @@ export default {
         until = until.toISOString()
       }
       this.loading = true
-      return db.collection('data')
-        .where('aggregate', '==', 'hour')
-        .where('__name__', '<=', until)
-        .where('__name__', '>=', from)
-        .orderBy('__name__', 'desc')
-        .get()
-        .then(snapshot => {
-          const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
-          this.loading = false
-          return values.filter(v => v.weather)
-      })
+      let aggregate = 'none'
+      if (this.zoomLevel > 1) aggregate = 'hour'
+      if (this.zoomLevel > 3) aggregate = 'day'
+      // hacky workaround for older data
+      let response
+      if (new Date(from).toISOString() < '2018-08-04T16:59:02.746Z') {
+        if (aggregate === 'none') {
+          response = db.collection('data')
+          .where('date', '<=', until)
+          .where('date', '>=', from)
+          .orderBy('date', 'desc')
+          .get()
+          .then(snapshot => {
+            const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
+            this.loading = false
+            return values.filter(v => v.weather)
+          })
+        } else {
+          response = db.collection('data')
+            .where('date', '<=', until)
+            .where('date', '>=', from)
+            .orderBy('date', 'desc')
+            .get()
+            .then(snapshot => {
+              const values = snapshot.docs
+                .map(d => Object.assign(d.data(), {_id: d.id}))
+                .filter(d => !d.aggregate || d.aggregate === 'none')
+                .filter((d, ix) => ix%(aggregate === 'hour' ? 4 : 6 * 4) === 0) // drop elements to mimic daily/hourly aggregations
+              this.loading = false
+              return values.filter(v => v.weather)
+          })
+        }
+      } else {
+        response = db.collection('data')
+          .where('aggregate', '==', aggregate)
+          .where('date', '<=', until)
+          .where('date', '>=', from)
+          .orderBy('date', 'desc')
+          .get()
+          .then(snapshot => {
+            const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
+            this.loading = false
+            return values.filter(v => v.weather)
+        })
+      }
+      return response
     },
     // pan left/right by given percentage (-1 .. 1)
     pan (percent = 0) {
