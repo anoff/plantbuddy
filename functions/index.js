@@ -21,6 +21,7 @@ exports.newData = functions.https.onRequest((req, res) => {
   const type = req.body.type
   const doc = JSON.parse(JSON.stringify(req.body))
   doc.date = new Date().toISOString()
+  doc.aggregate = 'none'
   return admin.firestore().collection(type).add(doc)
     .then(doc => {
       res.send(`Created entry ${doc.id} under /${type}`)
@@ -32,7 +33,7 @@ exports.fetchWeather = functions.firestore
   .document('data/{entryId}')
   .onCreate((snapshot, context) => {
     const data = snapshot.data()
-    if (data.aggregate) {
+    if (data.aggregate !== 'none') {
       console.log('Interrupted function execution')
       return null
     }
@@ -56,7 +57,7 @@ exports.aggregateHour = functions.firestore
   .document('data/{entryId}')
   .onUpdate((snapshot, context) => {
     const data = snapshot.after.data()
-    if (data.aggregate || !data.weather) {
+    if (data.aggregate !== 'none' || !data.weather) {
       console.log('Interrupted function execution')
       return null
     }
@@ -77,6 +78,7 @@ exports.aggregateHour = functions.firestore
     return admin.firestore().collection('data')
       .where('date', '>=', hourStart.toISOString())
       .where('date', '<=', hourEnd.toISOString())
+      .where('aggregate', '==', 'none')
       .get()
       .then(snapshot => {
         const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
@@ -150,13 +152,15 @@ exports.aggregateDay = functions.firestore
     aggregateId.setMinutes(0)
     aggregateId.setSeconds(0)
     aggregateId.setMilliseconds(0)
+    console.log(`Aggregating from ${aggregateStart.toISOString()} until ${aggregateEnd.toISOString()}`)
     return admin.firestore().collection('data')
       .where('date', '>=', aggregateStart.toISOString())
       .where('date', '<=', aggregateEnd.toISOString())
       .where('aggregate', '==', 'hour')
       .get()
       .then(snapshot => {
-        const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
+        const values = snapshot.docs
+          .map(d => Object.assign(d.data(), {_id: d.id}))
         const aggregate = values
           .reduce((p, c) => {
             p.humidity += c.humidity
@@ -182,7 +186,8 @@ exports.aggregateDay = functions.firestore
               wind: { speed: 0 }
             }
           })
-        const numElems = values.filter(v => !v.aggregate).length
+        const numElems = values.length
+        console.log({numElems})
         aggregate.humidity /= numElems
         aggregate.moisture /= numElems
         aggregate.temp /= numElems
@@ -193,6 +198,7 @@ exports.aggregateDay = functions.firestore
         aggregate.weather.wind.speed /= numElems
         aggregate.date = aggregateId.toISOString()
 
+        console.log(`Storing aggregate ${aggregateId.toISOString()}`)
         return admin.firestore().collection('data').doc(aggregateId.toISOString()).set(aggregate)
       })
   })
