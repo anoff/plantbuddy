@@ -1,5 +1,7 @@
 <template>
-<div>
+<div
+  
+>
   <div id="progressContainer">
     <v-progress-linear
       height="20"
@@ -13,20 +15,24 @@
       <v-flex xs12>
         <line-chart :chartData="dataCollection" :timeFrom="timeFrom" :timeUntil="timeUntil" ref="line">
         </line-chart>
-        <div id="actions">
-          <v-btn id="zoomlevel" fab disabled>
+        <div id="actionBar"
+        v-bind:style="actionBarStyle"
+        >
+          <v-btn id="zoomlevel" fab
+          v-on:mousedown="startMoveActionBar"
+          >
           {{zoomLevel}}
           </v-btn>
-          <v-btn id="action-top" fab small color="accent" v-on:click.stop="zoomLevel = Math.max(chart.zoomMin, zoomLevel - 1)">
+          <v-btn id="action-top" fab small :color="actionColor" v-on:click.stop="zoomLevel = Math.max(chart.zoomMin, zoomLevel - 1)">
             <v-icon>zoom_in</v-icon>
           </v-btn>
-          <v-btn id="action-bottom" fab small color="accent" v-on:click.stop="zoomLevel = Math.min(chart.zoomMax, zoomLevel + 1)">
+          <v-btn id="action-bottom" fab small :color="actionColor" v-on:click.stop="zoomLevel = Math.min(chart.zoomMax, zoomLevel + 1)">
             <v-icon>zoom_out</v-icon>
           </v-btn>
-          <v-btn id="action-left" fab small color="accent" v-on:click.stop="pan(-0.3)">
+          <v-btn id="action-left" fab small :color="actionColor" v-on:click.stop="pan(-0.3)">
             <v-icon>chevron_left</v-icon>
           </v-btn>
-          <v-btn id="action-right" fab small color="accent" v-on:click.stop="pan(0.3)">
+          <v-btn id="action-right" fab small :color="actionColor" v-on:click.stop="pan(0.3)">
             <v-icon>chevron_right</v-icon>
           </v-btn>
         </div>
@@ -57,10 +63,20 @@ export default {
         zoomMax: 6
       },
       timeUntil: new Date(), // timeFrom is a computed value
-      loading: false
+      loading: false,
+      actionBarMoving: false,
+      actionBarDOM: document.getElementById('actionBar'),
+      actionBarStyle: {
+        left: '90%',
+        top: '30%'
+      },
+      actionBarTimer: null
     }
   },
   computed: {
+    actionColor: function () {
+      return this.actionBarMoving ? 'info' : 'accent'
+    },
     dataCollection: function () {
       const collection = { labels: this.values.map(v => new Date(v.date)), datasets: [] }
       collection.datasets.push({
@@ -138,6 +154,8 @@ export default {
       .then(val => {
         this.values = val
       })
+    window.addEventListener('mousemove', this.moveActionBar)
+    window.addEventListener('mouseup', this.stopMoveActionBar)
   },
   methods: {
     loadData (from, until) {
@@ -214,6 +232,20 @@ export default {
       this.timeUntil = new Date(this.timeUntil.getTime() + percent * timeSpan)
       this.loadData (this.timeFrom, this.timeUntil)
         .then(val => this.values = this.values.concat(val))
+    },
+    startMoveActionBar () {
+      this.actionBarTimer = setTimeout(() => this.actionBarMoving = true, 600)
+    },
+    stopMoveActionBar () {
+      clearTimeout(this.actionBarTimer)
+      this.actionBarTimer = null
+      this.actionBarMoving = false
+    },
+    moveActionBar (event) {
+      if (this.actionBarMoving) {
+        this.actionBarStyle.left = event.x - 60 + 'px'
+        this.actionBarStyle.top = event.y - 60 + 'px'
+      }
     }
   },
   watch: {
@@ -239,12 +271,10 @@ export default {
   padding-top: 0;
 }
 
-#actions {
+#actionBar {
   width: 120px;
   height: 120px;
   position: absolute;
-  top: 30%;
-  right: 5%;
 }
 #action-top {
   top: 0px;
@@ -262,7 +292,7 @@ export default {
   top: 33px;
   right: 0px;
 }
-#actions .v-btn {
+#actionBar .v-btn {
   position: absolute;
 }
 #zoomlevel {
