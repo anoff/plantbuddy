@@ -157,6 +157,7 @@ export default {
     window.addEventListener('touchmove', this.moveActionBar)
     window.addEventListener('mouseup', this.stopMoveActionBar)
     window.addEventListener('touchend', this.stopMoveActionBar)
+    window.addEventListener('touchcancel', this.stopMoveActionBar)
   },
   methods: {
     loadData (from, until) {
@@ -244,6 +245,8 @@ export default {
     },
     moveActionBar (event) {
       if (this.actionBarMoving) {
+        const x = event.x || event.pageX
+        const y = event.y || event.pageY
         this.actionBarStyle.left = event.x - 60 + 'px'
         this.actionBarStyle.top = event.y - 60 + 'px'
       }
