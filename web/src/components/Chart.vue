@@ -243,8 +243,8 @@ export default {
   width: 120px;
   height: 120px;
   position: absolute;
-  top: 80px;
-  right: 50px;
+  top: 30%;
+  right: 5%;
 }
 #action-top {
   top: 0px;
