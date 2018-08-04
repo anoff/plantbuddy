@@ -86,7 +86,7 @@ exports.aggregateHour = functions.firestore
             p.humidity += c.humidity
             p.moisture += c.moisture
             p.temp += c.temp
-            if (!c.weather || !c.weather.main || !c.weather.clouds || !c.weather.clouds.all) return p
+            if (!c.weather || !c.weather.main || !c.weather.clouds || c.weather.clouds.all === undefined) return p
             p.weather.clouds.all += c.weather.clouds.all
             p.weather.main.humidity += c.weather.main.humidity
             p.weather.main.pressure += c.weather.main.pressure
@@ -108,6 +108,7 @@ exports.aggregateHour = functions.firestore
             }
           })
         const numElems = values.filter(v => !v.aggregate).length
+        console.log({numElems})
         aggregate.humidity /= numElems
         aggregate.moisture /= numElems
         aggregate.temp /= numElems
