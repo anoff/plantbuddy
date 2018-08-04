@@ -40,6 +40,10 @@ export default {
   data () {
     return {
       values: [],
+      loadedTimerange: {
+        min: null,
+        max: null
+      },
       zoomLevel: 2,
       chart: {
         zoomMin: 1,
@@ -136,6 +140,9 @@ export default {
       if (typeof until === 'object') {
         until = until.toISOString()
       }
+      if (from >= this.loadedTimerange.min && until <= this.loadedTimerange.max) return Promise.resolve([])
+      if (until > this.loadedTimerange.min && from < this.loadedTimerange.min) until = this.loadedTimerange.min
+      if (from < this.loadedTimerange.max && until > this.loadedTimerange.max) from = this.loadedTimerange.max
       this.loading = true
       let aggregate = 'none'
       if (this.zoomLevel > 1) aggregate = 'hour'
@@ -150,7 +157,9 @@ export default {
           .orderBy('date', 'desc')
           .get()
           .then(snapshot => {
-            const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
+            const values = snapshot.docs
+              .map(d => Object.assign(d.data(), {_id: d.id}))
+              .filter(d => !d.aggregate || d.aggregate === 'none')
             this.loading = false
             return values.filter(v => v.weather)
           })
@@ -182,6 +191,12 @@ export default {
             return values.filter(v => v.weather)
         })
       }
+      if (!this.loadedTimerange.min || from < this.loadedTimerange.min) {
+        this.loadedTimerange.min = from
+      }
+      if (!this.loadedTimerange.max || until > this.loadedTimerange.max) {
+        this.loadedTimerange.max = until
+      }
       return response
     },
     // pan left/right by given percentage (-1 .. 1)
@@ -190,15 +205,13 @@ export default {
       const prevUntil = this.timeUntil
       const timeSpan = this.timeSpan * 3600 * 1000
       this.timeUntil = new Date(this.timeUntil.getTime() + percent * timeSpan)
-      if (percent < 0) {
-        // TODO: proper logic to identify unknown data points
-        this.loadData (this.timeFrom, prevFrom)
-          .then(val => this.values = this.values.concat(val))
-      }
+      this.loadData (this.timeFrom, this.timeUntil)
+        .then(val => this.values = this.values.concat(val))
     }
   },
   watch: {
     zoomLevel () {
+      this.loadedTimerange = {min: null, max: null}
       this.loadData (this.timeFrom, this.timeUntil)
       .then(val => this.values = val)
     }
