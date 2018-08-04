@@ -245,10 +245,10 @@ export default {
     },
     moveActionBar (event) {
       if (this.actionBarMoving) {
-        const x = event.x || event.pageX
-        const y = event.y || event.pageY
-        this.actionBarStyle.left = event.x - 60 + 'px'
-        this.actionBarStyle.top = event.y - 60 + 'px'
+        const x = event.x || event.touches[0].pageX
+        const y = event.y || event.touches[0].pageY
+        this.actionBarStyle.left = x - 60 + 'px'
+        this.actionBarStyle.top = y - 60 + 'px'
       }
     }
   },
