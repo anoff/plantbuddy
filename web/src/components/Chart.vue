@@ -1,7 +1,5 @@
 <template>
-<div
-  
->
+<div>
   <div id="progressContainer">
     <v-progress-linear
       height="20"
@@ -20,6 +18,7 @@
         >
           <v-btn id="zoomlevel" fab large
           v-on:mousedown="startMoveActionBar"
+          v-on:touchstart="startMoveActionBar"
           >
           <span>{{zoomLevel}}</span>
           </v-btn>
@@ -67,7 +66,7 @@ export default {
       actionBarMoving: false,
       actionBarDOM: document.getElementById('actionBar'),
       actionBarStyle: {
-        left: '90%',
+        left: '10%',
         top: '30%'
       },
       actionBarTimer: null
@@ -155,7 +154,9 @@ export default {
         this.values = val
       })
     window.addEventListener('mousemove', this.moveActionBar)
+    window.addEventListener('touchmove', this.moveActionBar)
     window.addEventListener('mouseup', this.stopMoveActionBar)
+    window.addEventListener('touchend', this.stopMoveActionBar)
   },
   methods: {
     loadData (from, until) {
