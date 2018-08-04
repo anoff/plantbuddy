@@ -18,10 +18,10 @@
         <div id="actionBar"
         v-bind:style="actionBarStyle"
         >
-          <v-btn id="zoomlevel" fab
+          <v-btn id="zoomlevel" fab large
           v-on:mousedown="startMoveActionBar"
           >
-          {{zoomLevel}}
+          <span>{{zoomLevel}}</span>
           </v-btn>
           <v-btn id="action-top" fab small :color="actionColor" v-on:click.stop="zoomLevel = Math.max(chart.zoomMin, zoomLevel - 1)">
             <v-icon>zoom_in</v-icon>
@@ -272,24 +272,24 @@ export default {
 }
 
 #actionBar {
-  width: 120px;
-  height: 120px;
+  width: 145px;
+  height: 140px;
   position: absolute;
 }
 #action-top {
   top: 0px;
-  left: 32px;
+  left: 47px;
 }
 #action-bottom {
   bottom: 0px;
-  left: 32px;
+  left: 47px;
 }
 #action-left {
-  top: 33px;
+  top: 45px;
   left: 0px;
 }
 #action-right {
-  top: 33px;
+  top: 45px;
   right: 0px;
 }
 #actionBar .v-btn {
@@ -297,7 +297,10 @@ export default {
 }
 #zoomlevel {
   position: absolute;
-  top: 25px;
-  left: 25px;
+  top: 30px;
+  left: 30px;
+}
+#zoomlevel span {
+  color: gray;
 }
 </style>
