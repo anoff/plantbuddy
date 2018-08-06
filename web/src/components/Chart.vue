@@ -213,7 +213,7 @@ export default {
           .orderBy('date', 'desc')
           .get()
           .then(snapshot => {
-            const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id, date: d.id}))
+            const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
             this.loading = false
             return values.filter(v => v.weather)
         })

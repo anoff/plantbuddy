@@ -58,7 +58,7 @@ exports.aggregateHour = functions.firestore
   .onUpdate((snapshot, context) => {
     const data = snapshot.after.data()
     if (data.aggregate !== 'none' || !data.weather) {
-      console.log('Interrupted function execution')
+      console.log('Interrupted function execution', {aggregate: data.aggregate})
       return null
     }
     const date = data.date
@@ -130,10 +130,10 @@ exports.aggregateHour = functions.firestore
 // due to onUpdate will not run on the first hour aggregation; should be fine if base interval is <30min
 exports.aggregateDay = functions.firestore
   .document('data/{entryId}')
-  .onUpdate((snapshot, context) => {
+  .onWrite((snapshot, context) => {
     const data = snapshot.after.data()
     if (data.aggregate !== 'hour') {
-      console.log('Interrupted function execution')
+      console.log('Interrupted function execution', {aggregate: data.aggregate})
       return null
     }
     const date = data.date
