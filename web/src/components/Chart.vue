@@ -176,7 +176,7 @@ export default {
       if (this.zoomLevel > 3) aggregate = 'day'
       // hacky workaround for older data
       let response
-      if (new Date(from).toISOString() < '2018-08-04T16:59:02.746Z') {
+      if (true || new Date(from).toISOString() < '2018-08-04T16:59:02.746Z') { // hack to disable proper aggregation..
         if (aggregate === 'none') {
           response = db.collection('data')
           .where('date', '<=', until)
@@ -206,6 +206,7 @@ export default {
           })
         }
       } else {
+        console.log('else', aggregate)
         response = db.collection('data')
           .where('aggregate', '==', aggregate)
           .where('date', '<=', until)
@@ -214,6 +215,7 @@ export default {
           .get()
           .then(snapshot => {
             const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
+            console.log(JSON.stringify(values))
             this.loading = false
             return values.filter(v => v.weather)
         })
