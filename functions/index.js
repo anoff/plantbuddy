@@ -109,7 +109,7 @@ exports.aggregateHour = functions.firestore
               wind: { speed: 0 }
             }
           })
-        const numElems = values.filter(v => !v.aggregate).length
+        const numElems = values.length
         console.log({numElems})
         aggregate.humidity /= numElems
         aggregate.moisture /= numElems
