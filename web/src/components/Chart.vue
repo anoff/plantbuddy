@@ -176,7 +176,7 @@ export default {
       if (this.zoomLevel > 3) aggregate = 'day'
       // hacky workaround for older data
       let response
-      if (new Date(from).toISOString() < '2018-08-07T23:51:40.047Z') {
+      if (false || new Date(from).toISOString() < '2018-08-07T23:51:40.047Z') {
         if (aggregate === 'none') {
           response = db.collection('data')
           .where('date', '<=', until)
