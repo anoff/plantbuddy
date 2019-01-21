@@ -1,5 +1,7 @@
 # plantbuddy
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/anoff/plantbuddy.svg)](https://greenkeeper.io/)
+
 > nodeMCU based moisture monitoring for plants 🌱 with a serverless backend
 
 ## Main Features
