@@ -1,4 +1,4 @@
-# plantbuddy
+<p align="center"><img src="logo/horizontal.png" alt="plantbuddy" height="120px"></p>
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/anoff/plantbuddy.svg)](https://greenkeeper.io/)
 
@@ -90,3 +90,8 @@ docker run --rm caktux/travis-cli encrypt "<token from firebase login:ci>" -r an
 - http://www.instructables.com/id/Interface-Moisture-Sensor-With-NodeMCU/
 - https://www.losant.com/blog/getting-started-with-the-esp8266-and-dht22-sensor
 - https://www.losant.com/blog/making-the-esp8266-low-powered-with-deep-sleep
+
+## Attributions/license
+
+- The logo designed by [@realinfo](https://github.com/reallinfo)
+- The logo is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/)
