@@ -91,7 +91,8 @@ docker run --rm caktux/travis-cli encrypt "<token from firebase login:ci>" -r an
 - https://www.losant.com/blog/getting-started-with-the-esp8266-and-dht22-sensor
 - https://www.losant.com/blog/making-the-esp8266-low-powered-with-deep-sleep
 
-## Attributions/license
+## License
 
 - The logo designed by [@realinfo](https://github.com/reallinfo)
 - The logo is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/)
+- All sourcecode is licensed under [MIT](./LICENSE) unless stated otherwise
