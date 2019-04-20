@@ -1,15 +1,25 @@
 <p align="center"><img src="logo/horizontal.png" alt="plantbuddy" height="120px"></p>
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/anoff/plantbuddy.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/anoff/plantbuddy.svg?branch=master)](https://travis-ci.org/anoff/plantbuddy)
 
 > nodeMCU based moisture monitoring for plants 🌱 with a serverless backend
 
 ## Main Features
 
-1. Collect sensor readings every 5 minutes
+1. Collect sensor readings every 15 minutes
+1. Deep sleep to preserve battery
 1. Submit values to serverless infrastructure using local WiFi network
 1. Automatically fetch weather report for each reading using backend function
-1. later have a UI as well 🙄
+1. View sensor data on web page
+1. Movable navigation panel
+1. Mobile friendly page
+
+### Webpage demo
+
+![demo](assets/demo.gif)
+
+### System Overview
 
 ![system overview](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.github.com/anoff/plantbuddy/master/assets/overview.iuml)
 
@@ -20,7 +30,6 @@ The hardware setup consists of a [ESP8266](https://en.wikipedia.org/wiki/ESP8266
 - [DHT22](https://www.adafruit.com/product/385) connected to **D2** digital input pin
 - [Soil moisture sensor](https://www.sparkfun.com/products/13322) connected to **A0**
 - Bridge between **D0** and **RST** to enable deep sleep for optimizing battery life
-- switch off sensors during deepsleep using a transistor driven via pin **D1**
 
 > To program the ESP8266 you need to clear the connection to **RST**
 
@@ -63,7 +72,7 @@ firebase functions:config:set header.secret=<some secret>
 
 #### Local development
 
-For devleoping the function locally:
+For developing the function locally:
 
 ```sh
 # get a copy of the environment config
@@ -93,6 +102,6 @@ docker run --rm caktux/travis-cli encrypt "<token from firebase login:ci>" -r an
 
 ## License
 
-- The logo designed by [@realinfo](https://github.com/reallinfo)
+- The logo designed by [@reallinfo](https://github.com/reallinfo)
 - The logo is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/)
 - All sourcecode is licensed under [MIT](./LICENSE) unless stated otherwise
