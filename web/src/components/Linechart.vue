@@ -1,7 +1,7 @@
 <script>
-import {Line, mixins} from 'vue-chartjs'
+import { Line, mixins } from 'vue-chartjs'
 import zoom from 'chartjs-plugin-zoom'
-const {reactiveProp} = mixins
+const { reactiveProp } = mixins
 
 export default {
   extends: Line,
@@ -10,53 +10,53 @@ export default {
   data () {
     return {
       chartOptions: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true,
-                suggestedMax: 100
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              suggestedMax: 100
+            },
+            gridLines: {
+              display: true
+            }
+          }],
+          xAxes: [ {
+            type: 'time',
+            time: {
+              displayFormats: {
+                minute: 'HH:mm',
+                hour: 'HH:mm'
               },
-              gridLines: {
-                display: true
-              }
-            }],
-            xAxes: [ {
-              type: 'time',
-              time: {
-                displayFormats: {
-                  minute: 'HH:mm',
-                  hour: 'HH:mm'
-                },
-                tooltipFormat: 'YYYY-MM-DD HH:mm'
-              },
-              gridLines: {
-                display: false
-              }
-            }]
-          },
-          tooltips: {
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            titleFontColor: '#333',
-            displayColors: false,
-            bodyFontColor: '#000',
-            footerFontColor: '#333'
-          },
-          legend: {
-            display: true
-          },
-          responsive: true,
-          maintainAspectRatio: false,
-          pan: {
-            enabled: true,
-            mode: 'xy'
-          }
+              tooltipFormat: 'YYYY-MM-DD HH:mm'
+            },
+            gridLines: {
+              display: false
+            }
+          }]
+        },
+        tooltips: {
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          titleFontColor: '#333',
+          displayColors: false,
+          bodyFontColor: '#000',
+          footerFontColor: '#333'
+        },
+        legend: {
+          display: true
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        pan: {
+          enabled: true,
+          mode: 'xy'
         }
+      }
     }
   },
   mounted () {
     this.addPlugin(zoom)
     this.renderChart(this.chartData, this.chartOptions)
-    //this.updateZoom()
+    // this.updateZoom()
   },
   watch: {
     timeFrom () {

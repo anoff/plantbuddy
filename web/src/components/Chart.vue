@@ -43,7 +43,7 @@
 
 <script>
 import LineChart from './Linechart.vue'
-import {db} from '../main'
+import { db } from '../main'
 
 export default {
   components: {
@@ -149,7 +149,7 @@ export default {
     }
   },
   mounted () {
-    this.loadData (this.timeFrom, this.timeUntil)
+    this.loadData(this.timeFrom, this.timeUntil)
       .then(val => {
         this.values = val
       })
@@ -176,49 +176,33 @@ export default {
       if (this.zoomLevel > 3) aggregate = 'day'
       // hacky workaround for older data
       let response
-      if (true || new Date(from).toISOString() < '2018-08-07T23:51:40.047Z') {
-        if (aggregate === 'none') {
-          response = db.collection('data')
+      if (aggregate === 'none') {
+        response = db.collection('data')
           .where('date', '<=', until)
           .where('date', '>=', from)
           .orderBy('date', 'desc')
           .get()
           .then(snapshot => {
             const values = snapshot.docs
-              .map(d => Object.assign(d.data(), {_id: d.id}))
-              .filter(d => !d.aggregate || d.aggregate === 'none')
+              .map(d => Object.assign(d.data(), { _id: d.id }))
+              .filter(d => !d.aggregate || d.aggregate === 'none')
             this.loading = false
             return values.filter(v => v.weather)
           })
-        } else {
-          response = db.collection('data')
-            .where('date', '<=', until)
-            .where('date', '>=', from)
-            .orderBy('date', 'desc')
-            .get()
-            .then(snapshot => {
-              const values = snapshot.docs
-                .map(d => Object.assign(d.data(), {_id: d.id}))
-                .filter(d => !d.aggregate || d.aggregate === 'none')
-                .filter((d, ix) => ix%(aggregate === 'hour' ? 4 : 6 * 4) === 0) // drop elements to mimic daily/hourly aggregations
-              this.loading = false
-              return values.filter(v => v.weather)
-          })
-        }
       } else {
-        console.log('else', aggregate)
         response = db.collection('data')
-          .where('aggregate', '==', aggregate)
           .where('date', '<=', until)
           .where('date', '>=', from)
           .orderBy('date', 'desc')
           .get()
           .then(snapshot => {
-            const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
-            console.log(JSON.stringify(values))
+            const values = snapshot.docs
+              .map(d => Object.assign(d.data(), { _id: d.id }))
+              .filter(d => !d.aggregate || d.aggregate === 'none')
+              .filter((d, ix) => ix % (aggregate === 'hour' ? 4 : 6 * 4) === 0) // drop elements to mimic daily/hourly aggregations
             this.loading = false
             return values.filter(v => v.weather)
-        })
+          })
       }
       if (!this.loadedTimerange.min || from < this.loadedTimerange.min) {
         this.loadedTimerange.min = from
@@ -230,15 +214,13 @@ export default {
     },
     // pan left/right by given percentage (-1 .. 1)
     pan (percent = 0) {
-      const prevFrom = this.timeFrom
-      const prevUntil = this.timeUntil
       const timeSpan = this.timeSpan * 3600 * 1000
       this.timeUntil = new Date(this.timeUntil.getTime() + percent * timeSpan)
-      this.loadData (this.timeFrom, this.timeUntil)
-        .then(val => this.values = this.values.concat(val))
+      this.loadData(this.timeFrom, this.timeUntil)
+        .then(val => { this.values = this.values.concat(val) })
     },
     startMoveActionBar () {
-      this.actionBarTimer = setTimeout(() => this.actionBarMoving = true, 600)
+      this.actionBarTimer = setTimeout(() => { this.actionBarMoving = true }, 600)
     },
     stopMoveActionBar () {
       clearTimeout(this.actionBarTimer)
@@ -247,8 +229,8 @@ export default {
     },
     moveActionBar (event) {
       if (this.actionBarMoving) {
-        const x = event.x || event.touches[0].pageX
-        const y = event.y || event.touches[0].pageY
+        const x = event.x || event.touches[0].pageX
+        const y = event.y || event.touches[0].pageY
         this.actionBarStyle.left = x - 60 + 'px'
         this.actionBarStyle.top = y - 60 + 'px'
       }
@@ -256,9 +238,9 @@ export default {
   },
   watch: {
     zoomLevel () {
-      this.loadedTimerange = {min: null, max: null}
-      this.loadData (this.timeFrom, this.timeUntil)
-      .then(val => this.values = val)
+      this.loadedTimerange = { min: null, max: null }
+      this.loadData(this.timeFrom, this.timeUntil)
+        .then(val => { this.values = val })
     }
   }
 }
