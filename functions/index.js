@@ -15,7 +15,7 @@ exports.newData = functions.https.onRequest((req, res) => {
     return res.status(401).send('Unauthorized 👮‍ ')
   }
   if (!req.body || ['heartbeat', 'data'].indexOf(req.body.type) === -1) {
-    console.log({payload: req.body})
+    console.log({ payload: req.body })
     return res.status(400).send('Invalid payload type 📦')
   }
   const type = req.body.type
@@ -48,7 +48,7 @@ exports.fetchWeather = functions.firestore
         weather.sunrise = new Date(weather.sys.sunrise * 1000).toISOString()
         weather.sunset = new Date(weather.sys.sunset * 1000).toISOString()
 
-        return snapshot.ref.set({weather}, {merge: true})
+        return snapshot.ref.set({ weather }, { merge: true })
       })
   })
 
@@ -58,7 +58,7 @@ exports.aggregateHour = functions.firestore
   .onUpdate((snapshot, context) => {
     const data = snapshot.after.data()
     if (data.aggregate !== 'none' || !data.weather) {
-      console.log('Interrupted function execution', {aggregate: data.aggregate})
+      console.log('Interrupted function execution', { aggregate: data.aggregate })
       return null
     }
     const date = data.date
@@ -81,9 +81,8 @@ exports.aggregateHour = functions.firestore
       .where('aggregate', '==', 'none')
       .get()
       .then(snapshot => {
-        const values = snapshot.docs.map(d => Object.assign(d.data(), {_id: d.id}))
+        const values = snapshot.docs.map(d => Object.assign(d.data(), { _id: d.id }))
         const aggregate = values
-          .filter(v => !v.aggregate)
           .reduce((p, c) => {
             p.humidity += c.humidity
             p.moisture += c.moisture
@@ -110,7 +109,7 @@ exports.aggregateHour = functions.firestore
             }
           })
         const numElems = values.length
-        console.log({numElems})
+        console.log({ numElems })
         aggregate.humidity /= numElems
         aggregate.moisture /= numElems
         aggregate.temp /= numElems
@@ -133,7 +132,7 @@ exports.aggregateDay = functions.firestore
   .onWrite((snapshot, context) => {
     const data = snapshot.after.data()
     if (data.aggregate !== 'hour') {
-      console.log('Interrupted function execution', {aggregate: data.aggregate})
+      console.log('Interrupted function execution', { aggregate: data.aggregate })
       return null
     }
     const date = data.date
@@ -160,7 +159,7 @@ exports.aggregateDay = functions.firestore
       .get()
       .then(snapshot => {
         const values = snapshot.docs
-          .map(d => Object.assign(d.data(), {_id: d.id}))
+          .map(d => Object.assign(d.data(), { _id: d.id }))
         const aggregate = values
           .reduce((p, c) => {
             p.humidity += c.humidity
@@ -187,7 +186,7 @@ exports.aggregateDay = functions.firestore
             }
           })
         const numElems = values.length
-        console.log({numElems})
+        console.log({ numElems })
         aggregate.humidity /= numElems
         aggregate.moisture /= numElems
         aggregate.temp /= numElems
