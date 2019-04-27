@@ -1,15 +1,19 @@
 <template>
   <v-app>
     <v-toolbar color="primary">
-      <v-toolbar-title class="title" href="#">Plantbuddy</v-toolbar-title>
+      <v-toolbar-title class="title" href="#">PlantBuddy</v-toolbar-title>
     </v-toolbar>
-    <router-view/>
+    <chart></chart>
   </v-app>
 </template>
 
 <script>
+import Chart from './components/Chart.vue'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    Chart
+  }
 }
 </script>
 
