@@ -11,7 +11,7 @@
     "chart.js": "^2.8.0",
     "chartjs-plugin-zoom": "^0.7.0",
     "core-js": "^3.1.1",
-    "firebase": "^7.0.0",
+    "firebase": "^7.9.2",
     "material-design-icons-iconfont": "^5.0.1",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
