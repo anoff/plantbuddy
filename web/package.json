@@ -15,7 +15,7 @@
     "material-design-icons-iconfont": "^5.0.1",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
-    "vuetify": "^2.0.0"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.6.0",
